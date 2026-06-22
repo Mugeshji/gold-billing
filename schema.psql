@@ -1,0 +1,113 @@
+-- PostgreSQL Database Schema
+-- Project: Premium Jewel Billing Software
+-- Theme: Gold & Deep Red Showroom UI
+
+-- Create Database (Run this separately if needed)
+-- CREATE DATABASE gold_billing;
+
+-- Connect to the database (in psql use \c gold_billing)
+
+-- -----------------------------------------------------
+-- Table users
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(100) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  role VARCHAR(20) NOT NULL, -- Admin, Staff
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_users_username ON users(username);
+
+-- -----------------------------------------------------
+-- Table products (Inventory)
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS products (
+  id SERIAL PRIMARY KEY,
+  code VARCHAR(50) NOT NULL UNIQUE, -- SKU/Barcode
+  name VARCHAR(150) NOT NULL,
+  category VARCHAR(50) NOT NULL, -- Gold, Silver, Diamond, Other
+  purity VARCHAR(50) NOT NULL, -- 22K, 18K, 24K, 925, etc.
+  weight DECIMAL(10, 3) NOT NULL, -- Weight in grams
+  count INT NOT NULL DEFAULT 0, -- Quantity in stock
+  price_per_gram DECIMAL(12, 2) NOT NULL DEFAULT 0.00, -- Metal price per gram
+  making_charge_per_gram DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
+  wastage_percentage DECIMAL(5, 2) NOT NULL DEFAULT 0.00,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_products_code ON products(code);
+CREATE INDEX idx_products_category ON products(category);
+
+-- -----------------------------------------------------
+-- Table customers
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS customers (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(150) NOT NULL,
+  phone VARCHAR(20) NOT NULL UNIQUE,
+  email VARCHAR(100) NULL,
+  address TEXT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_customers_phone ON customers(phone);
+CREATE INDEX idx_customers_name ON customers(name);
+
+-- -----------------------------------------------------
+-- Table invoices
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS invoices (
+  id SERIAL PRIMARY KEY,
+  invoice_number VARCHAR(50) NOT NULL UNIQUE,
+  customer_id INT NOT NULL,
+  user_id INT NOT NULL,
+  invoice_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  subtotal DECIMAL(12, 2) NOT NULL, -- Sum of item amounts before GST
+  making_charges_total DECIMAL(12, 2) NOT NULL,
+  gst_amount DECIMAL(12, 2) NOT NULL, -- Total 3% GST (1.5% SGST + 1.5% CGST)
+  discount DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
+  total_amount DECIMAL(12, 2) NOT NULL, -- Final net amount payable
+  payment_status VARCHAR(20) NOT NULL, -- Paid, Partial, Unpaid
+  payment_mode VARCHAR(50) NOT NULL, -- Cash, Card, UPI, Bank Transfer
+  branch VARCHAR(100) NOT NULL DEFAULT 'Main Branch',
+  CONSTRAINT fk_invoices_customer FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
+  CONSTRAINT fk_invoices_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_invoices_number ON invoices(invoice_number);
+CREATE INDEX idx_invoices_date ON invoices(invoice_date);
+
+-- -----------------------------------------------------
+-- Table invoice_items
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS invoice_items (
+  id SERIAL PRIMARY KEY,
+  invoice_id INT NOT NULL,
+  product_id INT NULL,
+  item_name VARCHAR(150) NOT NULL,
+  category VARCHAR(50) NOT NULL,
+  weight DECIMAL(10, 3) NOT NULL,
+  purity VARCHAR(50) NOT NULL,
+  metal_rate DECIMAL(12, 2) NOT NULL,
+  making_charge DECIMAL(12, 2) NOT NULL,
+  wastage_percent DECIMAL(5, 2) NOT NULL,
+  gst_rate DECIMAL(5, 2) NOT NULL DEFAULT 3.00,
+  amount DECIMAL(12, 2) NOT NULL,
+  CONSTRAINT fk_items_invoice FOREIGN KEY (invoice_id) REFERENCES invoices (id) ON DELETE CASCADE,
+  CONSTRAINT fk_items_product FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE SET NULL
+);
+
+-- -----------------------------------------------------
+-- Table payments
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS payments (
+  id SERIAL PRIMARY KEY,
+  invoice_id INT NOT NULL,
+  payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  amount DECIMAL(12, 2) NOT NULL,
+  payment_mode VARCHAR(50) NOT NULL,
+  reference_number VARCHAR(100) NULL,
+  CONSTRAINT fk_payments_invoice FOREIGN KEY (invoice_id) REFERENCES invoices (id) ON DELETE CASCADE
+);
