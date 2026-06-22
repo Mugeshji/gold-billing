@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api',
+  baseURL: 'https://gold-billings.onrender.com/api',
 });
 
 // Add an interceptor to automatically add JWT token to all requests if it exists in local storage

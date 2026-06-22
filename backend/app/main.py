@@ -131,6 +131,6 @@ def read_root():
     return {
         "status": "online",
         "app": "Kaiya Luxury Jewel Billing Software Backend",
-        "database": "MySQL",
+        "database": "PostgreSQL",
         "health": "excellent"
     }
