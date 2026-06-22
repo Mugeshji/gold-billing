@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-gold-light: #F3E5AB;
+  --color-gold: #D4AF37;
+  --color-gold-dark: #AA7C11;
+  --color-gold-glow: rgba(212, 175, 55, 0.2);
+
+  --color-luxuryRed-light: #9E1B1B;
+  --color-luxuryRed: #7A0C0C;
+  --color-luxuryRed-dark: #540505;
+
+  --font-serif: "Cinzel", "Playfair Display", "Georgia", serif;
+  --font-sans: "Inter", "Montserrat", "system-ui", sans-serif;
+
+  --shadow-goldGlow: 0 0 15px rgba(212, 175, 55, 0.12);
+  --shadow-goldGlowStrong: 0 0 25px rgba(212, 175, 55, 0.25);
+  --shadow-redGlow: 0 0 15px rgba(122, 12, 12, 0.3);
+}
+
+@layer base {
+  body {
+    background: radial-gradient(circle at 50% 50%, #150606 0%, #080202 50%, #000000 100%);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+::-webkit-scrollbar-thumb {
+  background: #7A0C0C;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D4AF37;
+}
+
+/* Luxury Utilities */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #F3E5AB 0%, #D4AF37 50%, #AA7C11 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-gold-gradient {
+  background: linear-gradient(135deg, #F3E5AB 0%, #D4AF37 50%, #AA7C11 100%);
+}
+
+.border-gold-glow {
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.08);
+}
+
+.border-gold-glow:focus-within {
+  border-color: rgba(212, 175, 55, 0.5);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+}
+
+.glass-panel {
+  background: rgba(15, 10, 10, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(212, 175, 55, 0.08);
+}
+
+/* Custom Print Rules */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 12px !important;
+    font-family: 'Inter', sans-serif !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Hide non-printable components */
+  .no-print, button, .action-buttons {
+    display: none !important;
+  }
+
+  /* Remove fixed positioning from modal wrappers during print to prevent repeating pages */
+  .fixed.inset-0 {
+    position: relative !important;
+    background: transparent !important;
+    padding: 0 !important;
+    display: block !important;
+  }
+
+  .print-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important; /* Fix for cut-off totals */
+    overflow: visible !important; /* Fix for cut-off totals */
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  .print-border {
+    border: 1px solid #000000 !important;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th, td {
+    border: 1px solid #dddddd !important;
+    padding: 8px !important;
+    color: #000000 !important;
+  }
+
+  th {
+    background-color: #f2f2f2 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
